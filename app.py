@@ -128,3 +128,24 @@ if botao_side and op_sidebar == 'Ranking':
 
 elif botao_side and op_sidebar == 'BRASIL':
     st.table(ranking_brasil())
+    
+st.markdown(
+    """
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: ;
+        text-align: center;
+        padding: 10px;
+        font-size: 12px;
+    }
+    </style>
+    <div class="footer">
+        <p>© 2024 Alessandro - Todos os direitos reservados.</p>
+        <p><a href="https://github.com/Alelix-themage/olimpiadas_dashboard" target="_blank">Repositório no GitHub</a></p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
