@@ -78,6 +78,19 @@ def ranking_brasil():
         })
     return df_brasil
 
+def esportes():
+    json_urls = requests.get(url_esportes)
+    data = json.loads(json_urls.text)
+    df = pd.DataFrame(data['data'])
+    df['Emblema'] = df['pictogram_url'].apply(lambda x: f'<img src="{x}" height="100px" style="background: white;">')
+    data_esporte = df[['id', 'name', 'Emblema']]
+    data_esporte = data_esporte.rename( columns={
+        'id': 'Abreviação',
+        'name': 'Nome',
+        'pictogram_url': 'Emblema'
+    })
+    return data_esporte
+    
 st.header('Dashboard Jogos Olímpicos')
 st.markdown("Página feita para te atualizar sobre os jogos Olímpicos de 2024!")
 
@@ -100,7 +113,7 @@ if button_event:
     st.table(eventos())
 
 st.sidebar.title('GUIA')
-op_sidebar = st.sidebar.selectbox('Opções de Filtro', options=('','Ranking'))
+op_sidebar = st.sidebar.selectbox('Opções de Filtro', options=('','Ranking', 'Esportes'))
 
 
 if op_sidebar == 'Ranking':
@@ -108,11 +121,16 @@ if op_sidebar == 'Ranking':
     st.markdown(df_ranking.to_html(escape=False, index=False), unsafe_allow_html=True)
     grafico_medalhas(df_ranking)
 
+elif op_sidebar == 'Esportes':
+    df_esporte = esportes()
+    st.markdown(df_esporte.to_html(escape=False, index=False), unsafe_allow_html=True)
+    
+
 st.markdown(
     """
     <style>
     .footer {
-        position: fixed;
+        position: ;
         bottom: 0;
         width: 100%;
         text-align: center;
