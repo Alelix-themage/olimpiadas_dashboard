@@ -7,33 +7,32 @@ from apis import *
 
 
 #eventos 
-def enventos():
+def eventos():
     json_url = requests.get(url)
     data = json.loads(json_url.text)
 
     df = pd.DataFrame(data['data'])
-    print(df.head())
-    df_esporte = df[[ 'discipline_name', 'name', 'status']]
+    df_esporte = df[['discipline_name', 'name', 'status']]
     df_esporte = df_esporte.rename(columns={
         'discipline_name': 'Esporte',
         'name': 'Nome',
         'status': 'Status'
-
-    
     })
     return df_esporte
 
 
 #Ranking de Medalhas 
 def ranking(num):
-    
     json_url2 = requests.get(url_ranking)
     data_ranking = json.loads(json_url2.text)
 
     df = pd.DataFrame(data_ranking['data'])
-    df_esporte = df[['rank','name', 'gold_medals', 'silver_medals', 'bronze_medals', 'total_medals']]
+    #Para a visualização das bandeiras
+    df['Bandeira'] = df['flag_url'].apply(lambda x: f'<img src="{x}" width="50" height="30">')
+    df_esporte = df[['rank', 'Bandeira', 'name', 'gold_medals', 'silver_medals', 'bronze_medals', 'total_medals']]
     df_esporte = df_esporte.rename(columns={
-        'rank' : "Ranking",
+        'rank': "Ranking",
+        'Bandeira': 'Bandeira',
         'name': 'Nome',
         'gold_medals': 'Medalha de Ouro',
         'silver_medals': 'Medalha de Prata',
@@ -41,8 +40,7 @@ def ranking(num):
         'total_medals': "Total"
     })
     return df_esporte.head(num)
-    
-    
+
 # Função para criar gráfico de medalhas por país
 def grafico_medalhas(df):
     df = df.sort_values(by='Total', ascending=False).head(10)  # Mostra os top 10 países
@@ -59,76 +57,57 @@ def grafico_medalhas(df):
 
     st.pyplot(fig)
 
-
-#def update_table():
-    json_url2 = requests.get(url_ranking)
-    update = json.loads(json_url2.text)
-    df = pd.DataFrame(update['data'])
-    up = df[['name']]
-    up = up.rename(columns={
-        'name': 'Nome'
-    })
-    return up
-
-#def jogos():
-    json_url = requests.get(url_jogos)
-    data = json.loads(json_url.text)
-    df = pd.DataFrame(data['data'])
-    df_jogos_live = df[['discipline_name']]
-    return df_jogos_live
-
-
+# Função para mostrar o ranking do Brasil
 def ranking_brasil():
-    '''Mostra o Ranking do Brasil na Olímpiada'''
     json_url = requests.get(url_ranking)
     json_url.raise_for_status()
     data_ranking = json.loads(json_url.text)
     if 'data' in data_ranking:
-        df = pd.DataFrame(data_ranking['data'])
+        df = pd.DataFrame(data_ranking['data']) 
+        df['Bandeira'] = df['flag_url'].apply(lambda x: f'<img src="{x}" width="50" height="30">')
         df_brasil = df[df['name'] == 'Brasil']
-        df_brasil = df_brasil[['rank', 'name', 'gold_medals', 'silver_medals', 'bronze_medals', 'total_medals']]
+        df_brasil = df_brasil[['rank',  'Bandeira', 'name', 'gold_medals', 'silver_medals', 'bronze_medals', 'total_medals']]
         df_brasil = df_brasil.rename(columns={
             'rank': "Ranking",
+            'flag_url': 'Bandeira',
             'name': 'Nome',
             'gold_medals': 'Medalha de Ouro',
             'silver_medals': 'Medalha de Prata',
             'bronze_medals': "Medalha de Bronze",
             'total_medals': "Total"
         })
-    return df_brasil.head()
+    return df_brasil
 
 st.header('Dashboard Jogos Olímpicos')
 st.markdown("Página feita para te atualizar sobre os jogos Olímpicos de 2024!")
 
-st.sidebar.image('images/image.png', width=200 )
- 
+st.sidebar.image('images/image.png', width=200)
+
+st.markdown("## Posição do Brasil:")
+df_brazil = ranking_brasil()
+st.markdown(df_brazil.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 st.markdown("# Ranking de Medalhas")
 button_ranking = st.button('Exibir')
 if button_ranking:
-    st.table(ranking(15))
-    grafico_medalhas(ranking(10))
-
+    df_ranking = ranking(15)
+    st.markdown(df_ranking.to_html(escape=False, index=False), unsafe_allow_html=True)
+    grafico_medalhas(df_ranking)
 
 st.markdown("# Eventos")
 button_event = st.button(label='Exibir', key='button_event')
 if button_event:
-    st.table(enventos())
-
-
+    st.table(eventos())
 
 st.sidebar.title('GUIA')
-op_sidebar = st.sidebar.selectbox('Opções de Filtro', options=('','Ranking', 'BRASIL'))
-botao_side = st.sidebar.button('Buscar', key='buscar_side')
-
-if botao_side and op_sidebar == 'Ranking':
-    st.table(ranking(100))
-    grafico_medalhas(ranking(100))
+op_sidebar = st.sidebar.selectbox('Opções de Filtro', options=('','Ranking'))
 
 
-elif botao_side and op_sidebar == 'BRASIL':
-    st.table(ranking_brasil())
-    
+if op_sidebar == 'Ranking':
+    df_ranking = ranking(100)
+    st.markdown(df_ranking.to_html(escape=False, index=False), unsafe_allow_html=True)
+    grafico_medalhas(df_ranking)
+
 st.markdown(
     """
     <style>
@@ -136,14 +115,13 @@ st.markdown(
         position: fixed;
         bottom: 0;
         width: 100%;
-        background-color: ;
         text-align: center;
         padding: 10px;
         font-size: 12px;
     }
     </style>
     <div class="footer">
-        <p>© 2024 Alessandro - Todos os direitos reservados.</p>
+        <p>© 2024 Alessandro Junior - Todos os direitos reservados.</p>
         <p><a href="https://github.com/Alelix-themage/olimpiadas_dashboard" target="_blank">Repositório no GitHub</a></p>
     </div>
     """,
