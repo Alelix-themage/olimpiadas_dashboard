@@ -5,6 +5,7 @@ import json
 import requests
 from apis import *
 
+url_esportes = 'https://apis.codante.io/olympic-games/disciplines'
 
 #eventos 
 def eventos():
