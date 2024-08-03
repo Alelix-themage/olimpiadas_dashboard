@@ -35,9 +35,9 @@ def ranking(num):
         'rank': "Ranking",
         'Bandeira': 'Bandeira',
         'name': 'Nome',
-        'gold_medals': 'Medalha de Ouro',
-        'silver_medals': 'Medalha de Prata',
-        'bronze_medals': "Medalha de Bronze",
+        'gold_medals': 'Ouro',
+        'silver_medals': 'Prata',
+        'bronze_medals': "Bronze",
         'total_medals': "Total"
     })
     return df_esporte.head(num)
@@ -47,9 +47,9 @@ def grafico_medalhas(df):
     df = df.sort_values(by='Total', ascending=False).head(10)  # Mostra os top 10 países
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.barh(df['Nome'], df['Medalha de Ouro'], color='gold', label='Ouro')
-    ax.barh(df['Nome'], df['Medalha de Prata'], left=df['Medalha de Ouro'], color='silver', label='Prata')
-    ax.barh(df['Nome'], df['Medalha de Bronze'], left=df['Medalha de Ouro'] + df['Medalha de Prata'], color='brown', label='Bronze')
+    ax.barh(df['Nome'], df['Ouro'], color='gold', label='Ouro')
+    ax.barh(df['Nome'], df['Prata'], left=df['Ouro'], color='silver', label='Prata')
+    ax.barh(df['Nome'], df['Bronze'], left=df['Ouro'] + df['Prata'], color='brown', label='Bronze')
 
     ax.set_xlabel('Número de Medalhas')
     ax.set_ylabel('Países')
@@ -72,9 +72,9 @@ def ranking_brasil():
             'rank': "Ranking",
             'flag_url': 'Bandeira',
             'name': 'Nome',
-            'gold_medals': 'Medalha de Ouro',
-            'silver_medals': 'Medalha de Prata',
-            'bronze_medals': "Medalha de Bronze",
+            'gold_medals': 'Ouro',
+            'silver_medals': 'Prata',
+            'bronze_medals': "Bronze",
             'total_medals': "Total"
         })
     return df_brasil
@@ -91,6 +91,14 @@ def esportes():
         'pictogram_url': 'Emblema'
     })
     return data_esporte
+
+#Titulo na aba do site
+st.set_page_config(
+    page_title="Dashboard Olímpico",  
+    page_icon="🏅",  
+    layout="centered",  
+    initial_sidebar_state="auto",  
+)
     
 st.header('Dashboard Jogos Olímpicos')
 st.markdown("Página feita para te atualizar sobre os jogos Olímpicos de 2024!")
